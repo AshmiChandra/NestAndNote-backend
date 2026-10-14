@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: nest-and-note-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: JDBC_DATABASE_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: API_PUBLIC_HOST
+        fromService:
+          type: web
+          name: nest-and-note-api
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
+
+  - type: web
+    name: nest-and-note-frontend
+    repo: https://github.com/AshmiChandra/NestAndNote-frontend.git
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_HOST
+        fromService:
+          type: web
+          name: nest-and-note-api
+          envVarKey: API_PUBLIC_HOST
